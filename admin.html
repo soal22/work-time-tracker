@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Журнал сотрудников</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      background: #f0f0f0;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+      width: 90%;
+      background: white;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Журнал сотрудников</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Имя</th>
+        <th>Действие</th>
+        <th>Время</th>
+      </tr>
+    </thead>
+    <tbody id="logTable">
+      <tr><td colspan="3">Загрузка...</td></tr>
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3KtPkM6r6m_8Cz5tUTpM-ImAlU9pqOgI",
+      authDomain: "work-time-tracker-192ce.firebaseapp.com",
+      projectId: "work-time-tracker-192ce",
+      storageBucket: "work-time-tracker-192ce.firebasestorage.app",
+      messagingSenderId: "232237553063",
+      appId: "1:232237553063:web:7199d5461bdbf5e5d2d282",
+      measurementId: "G-EGM6G53Y26"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const table = document.getElementById("logTable");
+    table.innerHTML = "";
+
+    const q = query(collection(db, "work-time"), orderBy("timestamp", "desc"));
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const row = document.createElement("tr");
+
+      const name = data.name || "—";
+      const action = data.action || "—";
+      const time = data.timestamp?.toDate().toLocaleString() || "—";
+
+      row.innerHTML = `
+        <td>${name}</td>
+        <td>${action}</td>
+        <td>${time}</td>
+      `;
+      table.appendChild(row);
+    });
+  </script>
+</body>
+</html>
