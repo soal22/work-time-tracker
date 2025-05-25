@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Рабочее время</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 80px;
+    }
+    button {
+      padding: 20px 40px;
+      font-size: 20px;
+      margin: 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .in { background-color: #4caf50; color: white; }
+    .out { background-color: #f44336; color: white; }
+    .message { margin-top: 30px; font-size: 18px; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body>
+
+  <h1>Отметка рабочего времени</h1>
+  <input type="text" id="name" placeholder="Введите имя" />
+  <br><br>
+  <button class="in" onclick="mark('in')">Пришёл</button>
+  <button class="out" onclick="mark('out')">Ушёл</button>
+  <div class="message" id="msg"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3KtPkM6r6m_8Cz5tUTpM-ImAlU9pqOgI",
+      authDomain: "work-time-tracker-192ce.firebaseapp.com",
+      projectId: "work-time-tracker-192ce",
+      storageBucket: "work-time-tracker-192ce.firebasestorage.app",
+      messagingSenderId: "232237553063",
+      appId: "1:232237553063:web:7199d5461bdbf5e5d2d282",
+      measurementId: "G-EGM6G53Y26"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function mark(status) {
+      const name = document.getElementById("name").value.trim();
+      if (!name) {
+        alert("Введите имя!");
+        return;
+      }
+
+      const now = new Date();
+      db.collection("times").add({
+        name,
+        status,
+        timestamp: firebase.firestore.Timestamp.fromDate(now)
+      }).then(() => {
+        const action = status === 'in' ? 'приход' : 'уход';
+        document.getElementById("msg").textContent = `✅ ${name}, ${action} записан: ${now.toLocaleTimeString()}`;
+      }).catch(err => {
+        console.error(err);
+        document.getElementById("msg").textContent = "❌ Ошибка при записи.";
+      });
+    }
+  </script>
+
+</body>
+</html>
